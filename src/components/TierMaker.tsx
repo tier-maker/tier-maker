@@ -14,7 +14,9 @@ import ImagePool from "./ImagePool";
 import TierRowComponent from "./TierRow";
 import ClientWrapper from "./ClientWrapper";
 import ThemeSettings from "./ThemeSettings";
+import Navbar from "./Navbar";
 import { Download } from "lucide-react";
+import { exportElementAsImage } from "@/utils/exportUtils";
 
 export default function TierMaker() {
   const [tierList, setTierList] = useState<TierList>({
@@ -28,6 +30,8 @@ export default function TierMaker() {
     imagePool: [],
     theme: DEFAULT_THEMES[0],
   });
+
+  const [activeTab, setActiveTab] = useState("create");
 
   const handleImagesAdded = useCallback((newItems: TierItem[]) => {
     setTierList((prev) => ({
@@ -151,29 +155,36 @@ export default function TierMaker() {
     }));
   }, []);
 
-  const exportTierList = useCallback(() => {
-    // Simple export functionality - could be enhanced to export as image
-    const data = {
-      title: tierList.title,
-      rows: tierList.rows.map((row) => ({
-        label: row.label,
-        color: row.color,
-        items: row.items.map((item) => ({
-          name: item.name,
-          // Note: imageUrl would need to be converted to base64 for proper export
-        })),
-      })),
-    };
+  const exportTierList = useCallback(async () => {
+    const element = document.getElementById("tier-maker-content");
+    if (!element) return;
 
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${tierList.title}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      await exportElementAsImage(element, tierList.title);
+    } catch (error) {
+      console.error("Export failed:", error);
+      // 如果导出失败，回退到JSON导出
+      const data = {
+        title: tierList.title,
+        rows: tierList.rows.map((row) => ({
+          label: row.label,
+          color: row.color,
+          items: row.items.map((item) => ({
+            name: item.name,
+          })),
+        })),
+      };
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: "application/json",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${tierList.title}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
   }, [tierList]);
 
   const containerStyle = {
@@ -192,81 +203,122 @@ export default function TierMaker() {
 
   return (
     <ClientWrapper>
-      <div className="min-h-screen py-8" style={containerStyle}>
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="rounded-xl shadow-lg p-6" style={surfaceStyle}>
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <input
-                type="text"
-                value={tierList.title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                className="text-3xl font-bold bg-transparent border-none outline-none focus:bg-opacity-10 rounded px-2 py-1 transition-colors"
-                style={{
-                  color: tierList.theme.text,
-                  backgroundColor: "transparent",
-                }}
-                onFocus={(e) => {
-                  e.target.style.backgroundColor =
-                    tierList.theme.secondary + "40";
-                }}
-                onBlur={(e) => {
-                  e.target.style.backgroundColor = "transparent";
-                }}
-              />
-              <div className="flex gap-2">
-                <ThemeSettings
-                  currentTheme={tierList.theme}
-                  backgroundImage={tierList.backgroundImage}
-                  onThemeChange={handleThemeChange}
-                  onBackgroundChange={handleBackgroundChange}
-                />
-                <button
-                  onClick={exportTierList}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg hover:opacity-80 transition-colors"
+      <div className="min-h-screen" style={containerStyle}>
+        <Navbar
+          theme={tierList.theme}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onCreateNew={() => {
+            // Reset to new tier list
+            setTierList({
+              id: `tier-${Date.now()}`,
+              title: "我的 Tier List",
+              rows: DEFAULT_TIER_ROWS.map((row, index) => ({
+                ...row,
+                id: `tier-${index}`,
+                items: [],
+              })),
+              imagePool: [],
+              theme: tierList.theme,
+            });
+          }}
+          onSearch={(value) => {
+            // Search functionality could be implemented here
+            console.log("Search:", value);
+          }}
+          onOpenLibrary={() => {
+            // Library functionality could be implemented here
+            console.log("Open library");
+          }}
+          onShowHelp={() => {
+            // Help functionality could be implemented here
+            console.log("Show help");
+          }}
+        />
+        <div className="py-8">
+          <div className="max-w-6xl mx-auto px-4">
+            <div
+              id="tier-maker-content"
+              className="rounded-xl shadow-lg p-6 overflow-visible"
+              style={{
+                ...surfaceStyle,
+                minHeight: "auto",
+                position: "relative",
+              }}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <input
+                  type="text"
+                  value={tierList.title}
+                  onChange={(e) => handleTitleChange(e.target.value)}
+                  className="text-3xl font-bold bg-transparent border-none outline-none focus:bg-opacity-10 rounded px-2 py-1 transition-colors"
                   style={{
-                    backgroundColor: tierList.theme.primary,
-                    color: tierList.theme.surface,
+                    color: tierList.theme.text,
+                    backgroundColor: "transparent",
                   }}
-                >
-                  <Download size={20} />
-                  导出
-                </button>
-              </div>
-            </div>
-
-            <DragDropContext onDragEnd={handleDragEnd}>
-              {/* Tier Rows */}
-              <div className="mb-8">
-                <h2
-                  className="text-xl font-semibold mb-4"
-                  style={{ color: tierList.theme.text }}
-                >
-                  Tier 排行榜
-                </h2>
-                <div className="space-y-2">
-                  {tierList.rows.map((row) => (
-                    <TierRowComponent
-                      key={row.id}
-                      row={row}
-                      onRemoveItem={handleRemoveFromTier}
-                      onUpdateLabel={handleRowLabelUpdate}
-                    />
-                  ))}
+                  onFocus={(e) => {
+                    e.target.style.backgroundColor =
+                      tierList.theme.secondary + "40";
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.backgroundColor = "transparent";
+                  }}
+                />
+                <div className="flex gap-2">
+                  <ThemeSettings
+                    currentTheme={tierList.theme}
+                    backgroundImage={tierList.backgroundImage}
+                    onThemeChange={handleThemeChange}
+                    onBackgroundChange={handleBackgroundChange}
+                  />
+                  <button
+                    onClick={exportTierList}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg hover:opacity-80 transition-colors"
+                    style={{
+                      backgroundColor: tierList.theme.primary,
+                      color: tierList.theme.surface,
+                    }}
+                  >
+                    <Download size={20} />
+                    导出
+                  </button>
                 </div>
               </div>
 
-              {/* Image Pool */}
-              <div className="mb-6">
-                <ImagePool
-                  items={tierList.imagePool}
-                  onRemoveItem={handleRemoveFromPool}
-                />
-              </div>
-            </DragDropContext>
+              <DragDropContext onDragEnd={handleDragEnd}>
+                {/* Tier Rows */}
+                <div className="mb-8">
+                  <h2
+                    className="text-xl font-semibold mb-4"
+                    style={{ color: tierList.theme.text }}
+                  >
+                    Tier 排行榜
+                  </h2>
+                  <div className="space-y-2">
+                    {tierList.rows.map((row) => (
+                      <TierRowComponent
+                        key={row.id}
+                        row={row}
+                        onRemoveItem={handleRemoveFromTier}
+                        onUpdateLabel={handleRowLabelUpdate}
+                      />
+                    ))}
+                  </div>
+                </div>
 
-            {/* Image Upload */}
-            <ImageUpload onImagesAdded={handleImagesAdded} />
+                {/* Image Pool */}
+                <div className="mb-6">
+                  <ImagePool
+                    items={tierList.imagePool}
+                    onRemoveItem={handleRemoveFromPool}
+                  />
+                </div>
+              </DragDropContext>
+
+              {/* Image Upload */}
+              <ImageUpload onImagesAdded={handleImagesAdded} />
+            </div>
           </div>
         </div>
       </div>
