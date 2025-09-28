@@ -3,7 +3,6 @@
 import { TierItem } from "@/types";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { X, Eye } from "lucide-react";
-import Image from "next/image";
 import { Image as AntImage } from "antd";
 
 interface ImagePoolProps {
