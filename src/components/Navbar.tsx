@@ -14,7 +14,8 @@ import {
   Grid3X3,
   Sparkles,
 } from "lucide-react";
-import { Button, Input, Tooltip } from "antd";
+import { Input, Tooltip } from "antd";
+import Button from "./Button";
 
 interface NavbarProps {
   theme: Theme;
@@ -128,30 +129,13 @@ export default function Navbar({
             {navItems.map((item) => (
               <Tooltip key={item.key} title={item.label}>
                 <Button
-                  type={item.primary ? "primary" : "text"}
+                  variant={item.primary ? "primary" : "ghost"}
+                  size="md"
+                  theme={theme}
                   onClick={item.onClick}
-                  className={`
-                    inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200
-                    ${
-                      item.primary
-                        ? "shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                        : "hover:bg-opacity-80"
-                    }
-                  `}
-                  style={
-                    item.primary
-                      ? {
-                          background: `linear-gradient(135deg, ${theme.primary}, ${theme.primary}dd)`,
-                          borderColor: "transparent",
-                          color: "white",
-                        }
-                      : {
-                          color: theme.text,
-                          backgroundColor: "transparent",
-                        }
-                  }
+                  icon={item.icon}
+                  className={item.primary ? "shadow-lg hover:shadow-xl" : ""}
                 >
-                  {item.icon}
                   <span className="hidden lg:inline">{item.label}</span>
                 </Button>
               </Tooltip>
@@ -177,31 +161,40 @@ export default function Navbar({
           <div className="hidden md:flex items-center space-x-3">
             <Tooltip title="我的收藏">
               <Button
-                type="text"
+                variant="ghost"
+                size="md"
+                theme={theme}
                 icon={<Star size={18} />}
-                className="rounded-full"
-                style={{ color: theme.text }}
-              />
+                className="rounded-full w-10 h-10 p-0"
+              >
+                <span className="sr-only">我的收藏</span>
+              </Button>
             </Tooltip>
             <Tooltip title="网格视图">
               <Button
-                type="text"
+                variant="ghost"
+                size="md"
+                theme={theme}
                 icon={<Grid3X3 size={18} />}
-                className="rounded-full"
-                style={{ color: theme.text }}
-              />
+                className="rounded-full w-10 h-10 p-0"
+              >
+                <span className="sr-only">网格视图</span>
+              </Button>
             </Tooltip>
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <Button
-              type="text"
+              variant="ghost"
+              size="md"
+              theme={theme}
               icon={isMenuOpen ? <X size={20} /> : <Menu size={20} />}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="rounded-lg"
-              style={{ color: theme.text }}
-            />
+            >
+              <span className="sr-only">菜单</span>
+            </Button>
           </div>
         </div>
 
@@ -233,27 +226,18 @@ export default function Navbar({
               {navItems.map((item) => (
                 <Button
                   key={item.key}
-                  type={item.primary ? "primary" : "text"}
+                  variant={item.primary ? "primary" : "ghost"}
+                  size="lg"
+                  theme={theme}
                   onClick={() => {
                     item.onClick?.();
                     setIsMenuOpen(false);
                   }}
-                  className="w-full h-12 text-left rounded-lg inline-flex items-center gap-3 justify-start"
-                  style={
-                    item.primary
-                      ? {
-                          background: `linear-gradient(135deg, ${theme.primary}, ${theme.primary}dd)`,
-                          borderColor: "transparent",
-                          color: "white",
-                        }
-                      : {
-                          color: theme.text,
-                          backgroundColor: "transparent",
-                        }
-                  }
+                  icon={item.icon}
+                  fullWidth
+                  className="justify-start h-12"
                 >
-                  {item.icon}
-                  <span>{item.label}</span>
+                  {item.label}
                 </Button>
               ))}
             </div>
@@ -264,18 +248,20 @@ export default function Navbar({
               style={{ borderColor: `${theme.secondary}40` }}
             >
               <Button
-                type="text"
+                variant="ghost"
+                size="md"
+                theme={theme}
                 icon={<Star size={18} />}
-                className="flex-1 rounded-lg"
-                style={{ color: theme.text }}
+                className="flex-1"
               >
                 收藏
               </Button>
               <Button
-                type="text"
+                variant="ghost"
+                size="md"
+                theme={theme}
                 icon={<Grid3X3 size={18} />}
-                className="flex-1 rounded-lg"
-                style={{ color: theme.text }}
+                className="flex-1"
               >
                 网格
               </Button>

@@ -15,6 +15,7 @@ import TierRowComponent from "./TierRow";
 import ClientWrapper from "./ClientWrapper";
 import ThemeSettings from "./ThemeSettings";
 import Navbar from "./Navbar";
+import Button from "./Button";
 import { Download } from "lucide-react";
 import { exportElementAsImage } from "@/utils/exportUtils";
 
@@ -265,24 +266,23 @@ export default function TierMaker() {
                     e.target.style.backgroundColor = "transparent";
                   }}
                 />
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   <ThemeSettings
                     currentTheme={tierList.theme}
                     backgroundImage={tierList.backgroundImage}
                     onThemeChange={handleThemeChange}
                     onBackgroundChange={handleBackgroundChange}
+                    theme={tierList.theme}
                   />
-                  <button
+                  <Button
                     onClick={exportTierList}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg hover:opacity-80 transition-colors"
-                    style={{
-                      backgroundColor: tierList.theme.primary,
-                      color: tierList.theme.surface,
-                    }}
+                    variant="primary"
+                    size="md"
+                    theme={tierList.theme}
+                    icon={<Download size={18} />}
                   >
-                    <Download size={20} />
                     导出
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -317,7 +317,10 @@ export default function TierMaker() {
               </DragDropContext>
 
               {/* Image Upload */}
-              <ImageUpload onImagesAdded={handleImagesAdded} />
+              <ImageUpload
+                onImagesAdded={handleImagesAdded}
+                theme={tierList.theme}
+              />
             </div>
           </div>
         </div>

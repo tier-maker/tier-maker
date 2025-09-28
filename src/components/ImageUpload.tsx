@@ -2,13 +2,18 @@
 
 import { useCallback, useState } from "react";
 import { Upload } from "lucide-react";
-import { TierItem } from "@/types";
+import { TierItem, Theme } from "@/types";
+import Button from "./Button";
 
 interface ImageUploadProps {
   onImagesAdded: (items: TierItem[]) => void;
+  theme: Theme;
 }
 
-export default function ImageUpload({ onImagesAdded }: ImageUploadProps) {
+export default function ImageUpload({
+  onImagesAdded,
+  theme,
+}: ImageUploadProps) {
   const [isDragOver, setIsDragOver] = useState(false);
 
   const processFiles = useCallback(
@@ -95,12 +100,15 @@ export default function ImageUpload({ onImagesAdded }: ImageUploadProps) {
           className="hidden"
           id="file-upload"
         />
-        <label
-          htmlFor="file-upload"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+        <Button
+          variant="primary"
+          size="md"
+          theme={theme}
+          icon={<Upload size={18} />}
+          onClick={() => document.getElementById("file-upload")?.click()}
         >
           选择文件
-        </label>
+        </Button>
       </div>
     </div>
   );

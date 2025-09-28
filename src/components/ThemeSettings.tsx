@@ -2,13 +2,15 @@
 
 import { Theme, DEFAULT_THEMES } from "@/types";
 import { Upload, Palette, X } from "lucide-react";
-import { Button, Modal } from "antd";
+import { Modal } from "antd";
 import Image from "next/image";
+import Button from "./Button";
 import { useState, useCallback } from "react";
 
 interface ThemeSettingsProps {
   currentTheme: Theme;
   backgroundImage?: string;
+  theme: Theme;
   onThemeChange: (theme: Theme) => void;
   onBackgroundChange: (imageUrl?: string) => void;
 }
@@ -16,6 +18,7 @@ interface ThemeSettingsProps {
 export default function ThemeSettings({
   currentTheme,
   backgroundImage,
+  theme,
   onThemeChange,
   onBackgroundChange,
 }: ThemeSettingsProps) {
@@ -39,10 +42,11 @@ export default function ThemeSettings({
   return (
     <>
       <Button
-        type="primary"
-        icon={<Palette />}
+        variant="secondary"
+        size="md"
+        theme={theme}
+        icon={<Palette size={18} />}
         onClick={() => setIsModalVisible(true)}
-        className="flex items-center gap-2"
       >
         主题设置
       </Button>
