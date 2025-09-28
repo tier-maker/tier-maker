@@ -2,12 +2,19 @@
 
 import { useState, useCallback } from "react";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
-import { TierList, TierRow, TierItem, DEFAULT_TIER_ROWS } from "@/types";
+import {
+  TierList,
+  TierItem,
+  DEFAULT_TIER_ROWS,
+  DEFAULT_THEMES,
+  Theme,
+} from "@/types";
 import ImageUpload from "./ImageUpload";
 import ImagePool from "./ImagePool";
 import TierRowComponent from "./TierRow";
 import ClientWrapper from "./ClientWrapper";
-import { Download, Save } from "lucide-react";
+import ThemeSettings from "./ThemeSettings";
+import { Download } from "lucide-react";
 
 export default function TierMaker() {
   const [tierList, setTierList] = useState<TierList>({
@@ -19,6 +26,7 @@ export default function TierMaker() {
       items: [],
     })),
     imagePool: [],
+    theme: DEFAULT_THEMES[0],
   });
 
   const handleImagesAdded = useCallback((newItems: TierItem[]) => {
@@ -117,6 +125,32 @@ export default function TierMaker() {
     }));
   }, []);
 
+  const handleRowLabelUpdate = useCallback(
+    (rowId: string, newLabel: string) => {
+      setTierList((prev) => ({
+        ...prev,
+        rows: prev.rows.map((row) =>
+          row.id === rowId ? { ...row, label: newLabel } : row
+        ),
+      }));
+    },
+    []
+  );
+
+  const handleThemeChange = useCallback((theme: Theme) => {
+    setTierList((prev) => ({
+      ...prev,
+      theme,
+    }));
+  }, []);
+
+  const handleBackgroundChange = useCallback((imageUrl?: string) => {
+    setTierList((prev) => ({
+      ...prev,
+      backgroundImage: imageUrl,
+    }));
+  }, []);
+
   const exportTierList = useCallback(() => {
     // Simple export functionality - could be enhanced to export as image
     const data = {
@@ -142,23 +176,58 @@ export default function TierMaker() {
     URL.revokeObjectURL(url);
   }, [tierList]);
 
+  const containerStyle = {
+    background: tierList.backgroundImage
+      ? `url(${tierList.backgroundImage})`
+      : tierList.theme.background,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundAttachment: "fixed",
+  };
+
+  const surfaceStyle = {
+    backgroundColor: tierList.theme.surface,
+    color: tierList.theme.text,
+  };
+
   return (
     <ClientWrapper>
-      <div className="min-h-screen bg-gray-100 py-8">
+      <div className="min-h-screen py-8" style={containerStyle}>
         <div className="max-w-6xl mx-auto px-4">
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="rounded-xl shadow-lg p-6" style={surfaceStyle}>
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <input
                 type="text"
                 value={tierList.title}
                 onChange={(e) => handleTitleChange(e.target.value)}
-                className="text-3xl font-bold text-gray-800 bg-transparent border-none outline-none focus:bg-gray-50 rounded px-2 py-1"
+                className="text-3xl font-bold bg-transparent border-none outline-none focus:bg-opacity-10 rounded px-2 py-1 transition-colors"
+                style={{
+                  color: tierList.theme.text,
+                  backgroundColor: "transparent",
+                }}
+                onFocus={(e) => {
+                  e.target.style.backgroundColor =
+                    tierList.theme.secondary + "40";
+                }}
+                onBlur={(e) => {
+                  e.target.style.backgroundColor = "transparent";
+                }}
               />
               <div className="flex gap-2">
+                <ThemeSettings
+                  currentTheme={tierList.theme}
+                  backgroundImage={tierList.backgroundImage}
+                  onThemeChange={handleThemeChange}
+                  onBackgroundChange={handleBackgroundChange}
+                />
                 <button
                   onClick={exportTierList}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg hover:opacity-80 transition-colors"
+                  style={{
+                    backgroundColor: tierList.theme.primary,
+                    color: tierList.theme.surface,
+                  }}
                 >
                   <Download size={20} />
                   导出
@@ -169,7 +238,10 @@ export default function TierMaker() {
             <DragDropContext onDragEnd={handleDragEnd}>
               {/* Tier Rows */}
               <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4 text-gray-800">
+                <h2
+                  className="text-xl font-semibold mb-4"
+                  style={{ color: tierList.theme.text }}
+                >
                   Tier 排行榜
                 </h2>
                 <div className="space-y-2">
@@ -178,6 +250,7 @@ export default function TierMaker() {
                       key={row.id}
                       row={row}
                       onRemoveItem={handleRemoveFromTier}
+                      onUpdateLabel={handleRowLabelUpdate}
                     />
                   ))}
                 </div>

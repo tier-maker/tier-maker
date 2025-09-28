@@ -3,22 +3,68 @@
 import { TierRow as TierRowType } from "@/types";
 import Image from "next/image";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
-import { X } from "lucide-react";
+import { X, Edit2 } from "lucide-react";
+import { useState } from "react";
 
 interface TierRowProps {
   row: TierRowType;
   onRemoveItem: (rowId: string, itemId: string) => void;
+  onUpdateLabel: (rowId: string, newLabel: string) => void;
 }
 
-export default function TierRow({ row, onRemoveItem }: TierRowProps) {
+export default function TierRow({
+  row,
+  onRemoveItem,
+  onUpdateLabel,
+}: TierRowProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempLabel, setTempLabel] = useState(row.label);
+
+  const handleLabelSubmit = () => {
+    if (tempLabel.trim() && tempLabel !== row.label) {
+      onUpdateLabel(row.id, tempLabel.trim());
+    }
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleLabelSubmit();
+    } else if (e.key === "Escape") {
+      setTempLabel(row.label);
+      setIsEditing(false);
+    }
+  };
+
   return (
     <div className="flex items-stretch border border-gray-300 rounded-lg overflow-hidden mb-2">
       {/* Tier Label */}
       <div
-        className="flex items-center justify-center min-w-[80px] text-2xl font-bold text-white"
+        className="flex items-center justify-center min-w-[80px] text-2xl font-bold text-white relative group"
         style={{ backgroundColor: row.color }}
       >
-        {row.label}
+        {isEditing ? (
+          <input
+            type="text"
+            value={tempLabel}
+            onChange={(e) => setTempLabel(e.target.value)}
+            onBlur={handleLabelSubmit}
+            onKeyDown={handleKeyDown}
+            className="bg-transparent text-white text-center text-2xl font-bold border-none outline-none w-full"
+            autoFocus
+            maxLength={3}
+          />
+        ) : (
+          <>
+            <span>{row.label}</span>
+            <button
+              onClick={() => setIsEditing(true)}
+              className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-20 rounded p-1 hover:bg-opacity-40"
+            >
+              <Edit2 size={12} />
+            </button>
+          </>
+        )}
       </div>
 
       {/* Droppable Area */}
