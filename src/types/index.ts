@@ -62,9 +62,9 @@ export const DEFAULT_THEMES: Theme[] = [
 ];
 
 export const DEFAULT_TIER_ROWS: Omit<TierRow, "id" | "items">[] = [
-  { label: "S", color: "#ff7f7f" },
-  { label: "A", color: "#ffbf7f" },
-  { label: "B", color: "#ffdf7f" },
-  { label: "C", color: "#ffff7f" },
-  { label: "D", color: "#bfff7f" },
+  { label: "夯", color: "#ff7f7f" },
+  { label: "顶级", color: "#ffbf7f" },
+  { label: "人上人", color: "#ffdf7f" },
+  { label: "NPC", color: "#ffff7f" },
+  { label: "拉完了", color: "#bfff7f" },
 ];
