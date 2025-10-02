@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "download:heroes": "node ./scripts/download-heroes.mjs",
+    "download:arena": "node ./scripts/download-arena-augments.mjs"
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.2",
