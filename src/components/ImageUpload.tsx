@@ -71,27 +71,22 @@ export default function ImageUpload({
   );
 
   return (
-    <div className="w-full p-4">
+    <div className="w-full">
       <div
-        className={`
-          border-2 border-dashed rounded-lg p-8 text-center transition-colors
-          ${
-            isDragOver
-              ? "border-blue-500 bg-blue-50"
-              : "border-gray-300 hover:border-gray-400"
-          }
-        `}
+        className={`${
+          isDragOver
+            ? "border-blue-500 bg-blue-50"
+            : "border-gray-300 hover:border-gray-400"
+        } border-2 border-dashed rounded-md p-4 text-center transition-colors`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-        <p className="text-lg font-medium text-gray-900 mb-2">
+        <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+        <p className="text-base font-medium text-gray-900 mb-1">
           上传图片到图片池
         </p>
-        <p className="text-sm text-gray-500 mb-4">
-          拖拽图片到这里，或者点击选择文件
-        </p>
+        <p className="text-xs text-gray-500 mb-3">拖拽到此，或点击选择文件</p>
         <input
           type="file"
           multiple
@@ -102,7 +97,7 @@ export default function ImageUpload({
         />
         <Button
           variant="primary"
-          size="md"
+          size="sm"
           theme={theme}
           icon={<Upload size={18} />}
           onClick={() => document.getElementById("file-upload")?.click()}

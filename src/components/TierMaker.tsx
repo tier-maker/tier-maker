@@ -255,19 +255,19 @@ export default function TierMaker() {
             navigateToTab("help");
           }}
         />
-        <div className="py-8">
+        <div className="py-4">
           <div className="max-w-6xl mx-auto px-4">
             <div
               id="tier-maker-content"
-              className="rounded-xl shadow-lg p-6 overflow-visible"
+              className="rounded-xl shadow-lg p-4 overflow-visible"
               style={{
                 ...surfaceStyle,
-                minHeight: "auto",
+                minHeight: "calc(100vh - 140px)",
                 position: "relative",
               }}
             >
               {/* Header */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-4">
                 <input
                   type="text"
                   value={tierList.title}
@@ -285,7 +285,7 @@ export default function TierMaker() {
                     e.target.style.backgroundColor = "transparent";
                   }}
                 />
-                <div className="flex gap-3">
+                <div className="flex gap-2">
                   <ThemeSettings
                     currentTheme={tierList.theme}
                     backgroundImage={tierList.backgroundImage}
