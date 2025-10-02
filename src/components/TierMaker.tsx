@@ -18,8 +18,13 @@ import Navbar from "./Navbar";
 import Button from "./Button";
 import { Download } from "lucide-react";
 import { exportElementAsImage } from "@/utils/exportUtils";
+import { useNavigation } from "@/utils/navigation";
+import { usePathname } from "next/navigation";
 
 export default function TierMaker() {
+  const pathname = usePathname();
+  const { navigateToTab } = useNavigation();
+
   const [tierList, setTierList] = useState<TierList>({
     id: "tier-1",
     title: "我的 Tier List",
@@ -32,7 +37,23 @@ export default function TierMaker() {
     theme: DEFAULT_THEMES[0],
   });
 
-  const [activeTab, setActiveTab] = useState("create");
+  // 根据当前路径确定活跃的 tab
+  const getActiveTab = () => {
+    switch (pathname) {
+      case "/":
+        return "create";
+      case "/explore":
+        return "explore";
+      case "/library":
+        return "library";
+      case "/help":
+        return "help";
+      default:
+        return "create";
+    }
+  };
+
+  const activeTab = getActiveTab();
 
   const handleImagesAdded = useCallback((newItems: TierItem[]) => {
     setTierList((prev) => ({
@@ -208,7 +229,7 @@ export default function TierMaker() {
         <Navbar
           theme={tierList.theme}
           activeTab={activeTab}
-          onTabChange={setActiveTab}
+          onTabChange={navigateToTab}
           onCreateNew={() => {
             // Reset to new tier list
             setTierList({
@@ -228,12 +249,10 @@ export default function TierMaker() {
             console.log("Search:", value);
           }}
           onOpenLibrary={() => {
-            // Library functionality could be implemented here
-            console.log("Open library");
+            navigateToTab("library");
           }}
           onShowHelp={() => {
-            // Help functionality could be implemented here
-            console.log("Show help");
+            navigateToTab("help");
           }}
         />
         <div className="py-8">
