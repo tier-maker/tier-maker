@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import Image from "next/image";
 import { Theme } from "@/types";
 import { 
   Download, 
@@ -34,6 +33,7 @@ export default function HeroLibrary({ theme, onBack }: HeroLibraryProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [downloading, setDownloading] = useState(false);
   const [imageLoadErrors, setImageLoadErrors] = useState<Set<string>>(new Set());
+  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
 
   // 英雄名称映射（英文名 -> 中文名）
   const heroNameMap: Record<string, string> = {
@@ -215,6 +215,24 @@ export default function HeroLibrary({ theme, onBack }: HeroLibraryProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 预加载图片
+  useEffect(() => {
+    if (heroes.length > 0) {
+      // 预加载前几个图片以提升用户体验
+      const preloadImages = heroes.slice(0, 20);
+      preloadImages.forEach(hero => {
+        const img = new window.Image();
+        img.src = hero.imageUrl;
+        img.onload = () => {
+          setLoadedImages(prev => new Set([...prev, hero.name]));
+        };
+        img.onerror = () => {
+          setImageLoadErrors(prev => new Set([...prev, hero.name]));
+        };
+      });
+    }
+  }, [heroes]);
+
   const loadHeroes = async () => {
     try {
       setLoading(true);
@@ -257,7 +275,7 @@ export default function HeroLibrary({ theme, onBack }: HeroLibraryProps) {
         return {
           name,
           displayName: heroNameMap[name] || name,
-          imageUrl: `/hero/${filename}`
+          imageUrl: `./hero/${filename}` // 使用相对路径，适配静态导出
         };
       });
 
@@ -550,20 +568,36 @@ export default function HeroLibrary({ theme, onBack }: HeroLibraryProps) {
             >
               {viewMode === 'grid' ? (
                 <>
-                  <Image
-                    src={hero.imageUrl}
-                    alt={hero.displayName}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                    onError={(_e) => { 
-                      console.warn(`Failed to load image: ${hero.imageUrl}`);
-                      setImageLoadErrors(prev => new Set([...prev, hero.name]));
-                    }}
-                    onLoad={(_e) => {
-                      console.log(`Successfully loaded image: ${hero.name}`);
-                    }}
-                  />
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    {!imageLoadErrors.has(hero.name) ? (
+                      <img
+                        src={hero.imageUrl}
+                        alt={hero.displayName}
+                        className={`w-full h-full object-cover transition-opacity duration-300 ${
+                          loadedImages.has(hero.name) ? 'opacity-100' : 'opacity-0'
+                        }`}
+                        onError={(_e) => { 
+                          console.warn(`Failed to load image: ${hero.imageUrl}`);
+                          setImageLoadErrors(prev => new Set([...prev, hero.name]));
+                        }}
+                        onLoad={(_e) => {
+                          console.log(`Successfully loaded image: ${hero.name}`);
+                          setLoadedImages(prev => new Set([...prev, hero.name]));
+                        }}
+                        crossOrigin="anonymous"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-gray-500 text-xs p-2">
+                        <Package size={24} className="mb-1" />
+                        <span className="text-center">{hero.displayName}</span>
+                      </div>
+                    )}
+                    {!loadedImages.has(hero.name) && !imageLoadErrors.has(hero.name) && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-400"></div>
+                      </div>
+                    )}
+                  </div>
                   {/* 选中状态指示器 */}
                   {selectedHeroes.has(hero.name) && (
                     <div className="absolute top-2 right-2 z-10">
@@ -580,21 +614,34 @@ export default function HeroLibrary({ theme, onBack }: HeroLibraryProps) {
                 </>
               ) : (
                 <>
-                  <div className="relative w-12 h-12 rounded-lg overflow-hidden">
-                    <Image
-                      src={hero.imageUrl}
-                      alt={hero.displayName}
-                      fill
-                      className="object-cover"
-                      unoptimized
-                      onError={(_e) => {
-                        console.warn(`Failed to load image: ${hero.imageUrl}`);
-                        setImageLoadErrors(prev => new Set([...prev, hero.name]));
-                      }}
-                      onLoad={(_e) => {
-                        console.log(`Successfully loaded image: ${hero.name}`);
-                      }}
-                    />
+                  <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-gray-200 flex items-center justify-center">
+                    {!imageLoadErrors.has(hero.name) ? (
+                      <img
+                        src={hero.imageUrl}
+                        alt={hero.displayName}
+                        className={`w-full h-full object-cover transition-opacity duration-300 ${
+                          loadedImages.has(hero.name) ? 'opacity-100' : 'opacity-0'
+                        }`}
+                        onError={(_e) => {
+                          console.warn(`Failed to load image: ${hero.imageUrl}`);
+                          setImageLoadErrors(prev => new Set([...prev, hero.name]));
+                        }}
+                        onLoad={(_e) => {
+                          console.log(`Successfully loaded image: ${hero.name}`);
+                          setLoadedImages(prev => new Set([...prev, hero.name]));
+                        }}
+                        crossOrigin="anonymous"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center text-gray-500">
+                        <Package size={16} />
+                      </div>
+                    )}
+                    {!loadedImages.has(hero.name) && !imageLoadErrors.has(hero.name) && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1">
                     <div className="font-medium" style={{ color: theme.text }}>
