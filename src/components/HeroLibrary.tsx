@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import Image from "next/image";
 import { Theme } from "@/types";
 import { 
   Download, 
@@ -423,7 +424,7 @@ export default function HeroLibrary({ theme, onBack }: HeroLibraryProps) {
               
               // 测试第一个图片是否可以加载
               if (heroes[0]) {
-                const testImg = new Image();
+                const testImg = new window.Image();
                 testImg.onload = () => console.log('✅ Test image loaded successfully');
                 testImg.onerror = () => console.log('❌ Test image failed to load');
                 testImg.src = heroes[0].imageUrl;
@@ -535,7 +536,7 @@ export default function HeroLibrary({ theme, onBack }: HeroLibraryProps) {
               key={hero.name}
               className={`
                 relative group cursor-pointer transition-all duration-200 hover:scale-105
-                ${viewMode === 'grid' ? 'aspect-square' : 'flex items-center gap-3 p-3'}
+                ${viewMode === 'grid' ? 'aspect-square relative' : 'flex items-center gap-3 p-3'}
               `}
               style={{ 
                 backgroundColor: theme.surface,
@@ -549,10 +550,12 @@ export default function HeroLibrary({ theme, onBack }: HeroLibraryProps) {
             >
               {viewMode === 'grid' ? (
                 <>
-                  <img
+                  <Image
                     src={hero.imageUrl}
                     alt={hero.displayName}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    unoptimized
                     onError={(_e) => { 
                       console.warn(`Failed to load image: ${hero.imageUrl}`);
                       setImageLoadErrors(prev => new Set([...prev, hero.name]));
@@ -577,18 +580,22 @@ export default function HeroLibrary({ theme, onBack }: HeroLibraryProps) {
                 </>
               ) : (
                 <>
-                  <img
-                    src={hero.imageUrl}
-                    alt={hero.displayName}
-                    className="w-12 h-12 object-cover rounded-lg"
-                    onError={(_e) => {
-                      console.warn(`Failed to load image: ${hero.imageUrl}`);
-                      setImageLoadErrors(prev => new Set([...prev, hero.name]));
-                    }}
-                    onLoad={(_e) => {
-                      console.log(`Successfully loaded image: ${hero.name}`);
-                    }}
-                  />
+                  <div className="relative w-12 h-12 rounded-lg overflow-hidden">
+                    <Image
+                      src={hero.imageUrl}
+                      alt={hero.displayName}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                      onError={(_e) => {
+                        console.warn(`Failed to load image: ${hero.imageUrl}`);
+                        setImageLoadErrors(prev => new Set([...prev, hero.name]));
+                      }}
+                      onLoad={(_e) => {
+                        console.log(`Successfully loaded image: ${hero.name}`);
+                      }}
+                    />
+                  </div>
                   <div className="flex-1">
                     <div className="font-medium" style={{ color: theme.text }}>
                       {hero.displayName}
