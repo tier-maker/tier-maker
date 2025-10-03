@@ -1,7 +1,7 @@
 import html2canvas from "html2canvas";
 
 // 创建一个安全的 html2canvas 包装器来处理颜色解析错误
-const safeHtml2Canvas = async (element: HTMLElement, options: any): Promise<HTMLCanvasElement> => {
+const safeHtml2Canvas = async (element: HTMLElement, options: Record<string, unknown>): Promise<HTMLCanvasElement> => {
   console.log('🎨 Using safeHtml2Canvas wrapper');
   try {
     console.log('🎨 First attempt with original configuration');
@@ -222,7 +222,7 @@ export const exportElementAsImage = async (
       // 添加更多选项来确保正确渲染
       imageTimeout: 15000,
       // 忽略某些CSS属性来避免解析错误
-      ignoreElements: (element: Element) => {
+      ignoreElements: (_element: Element) => {
         // 可以在这里忽略特定元素
         return false;
       },

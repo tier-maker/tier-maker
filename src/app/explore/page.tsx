@@ -1,6 +1,6 @@
 "use client";
 
-import { Theme, DEFAULT_THEMES } from "@/types";
+import { DEFAULT_THEMES } from "@/types";
 import Navbar from "@/components/Navbar";
 import ClientWrapper from "@/components/ClientWrapper";
 import { useNavigation } from "@/utils/navigation";

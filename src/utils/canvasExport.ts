@@ -13,7 +13,7 @@ const TIER_COLORS: Record<string, string> = {
 
 // 加载图片的 Promise 包装器
 const loadImage = (src: string): Promise<HTMLImageElement> => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, _reject) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => resolve(img);
@@ -132,7 +132,7 @@ export const exportTierListAsCanvas = async (
         // 添加半透明覆盖层以确保文字可读
         ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-      } catch (e) {
+      } catch (_e) {
         console.warn('Failed to load background image, using solid color');
         ctx.fillStyle = tierList.theme.background || '#ffffff';
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
@@ -159,7 +159,7 @@ export const exportTierListAsCanvas = async (
             const img = await loadImage(item.imageUrl);
             allImages.set(item.imageUrl, img);
             console.log(`✅ Loaded image: ${item.name}`);
-          } catch (e) {
+          } catch (_e) {
             console.warn(`❌ Failed to load image: ${item.name}`);
           }
         }

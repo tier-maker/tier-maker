@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Theme, DEFAULT_THEMES } from "@/types";
+import { DEFAULT_THEMES } from "@/types";
 import Navbar from "@/components/Navbar";
 import ClientWrapper from "@/components/ClientWrapper";
 import HeroLibrary from "@/components/HeroLibrary";
 import { useNavigation } from "@/utils/navigation";
-import { FolderOpen, Upload, Download, Trash2, Star, GamepadIcon } from "lucide-react";
+import { FolderOpen, Upload, Download, Star, GamepadIcon } from "lucide-react";
 
 export default function LibraryPage() {
   const theme = DEFAULT_THEMES[0]; // 使用默认主题

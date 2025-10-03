@@ -9,7 +9,6 @@ import {
   Square, 
   Package,
   ArrowLeft,
-  Filter,
   Grid3X3,
   List
 } from "lucide-react";
@@ -212,6 +211,7 @@ export default function HeroLibrary({ theme, onBack }: HeroLibraryProps) {
 
   useEffect(() => {
     loadHeroes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadHeroes = async () => {
@@ -553,11 +553,11 @@ export default function HeroLibrary({ theme, onBack }: HeroLibraryProps) {
                     src={hero.imageUrl}
                     alt={hero.displayName}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
+                    onError={(_e) => { 
                       console.warn(`Failed to load image: ${hero.imageUrl}`);
                       setImageLoadErrors(prev => new Set([...prev, hero.name]));
                     }}
-                    onLoad={(e) => {
+                    onLoad={(_e) => {
                       console.log(`Successfully loaded image: ${hero.name}`);
                     }}
                   />
@@ -581,11 +581,11 @@ export default function HeroLibrary({ theme, onBack }: HeroLibraryProps) {
                     src={hero.imageUrl}
                     alt={hero.displayName}
                     className="w-12 h-12 object-cover rounded-lg"
-                    onError={(e) => {
+                    onError={(_e) => {
                       console.warn(`Failed to load image: ${hero.imageUrl}`);
                       setImageLoadErrors(prev => new Set([...prev, hero.name]));
                     }}
-                    onLoad={(e) => {
+                    onLoad={(_e) => {
                       console.log(`Successfully loaded image: ${hero.name}`);
                     }}
                   />
