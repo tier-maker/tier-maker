@@ -2,8 +2,7 @@
 
 import { TierItem } from "@/types";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
-import { X, Eye } from "lucide-react";
-import { Image as AntImage } from "antd";
+import { X } from "lucide-react";
 
 interface ImagePoolProps {
   items: TierItem[];
@@ -47,19 +46,11 @@ export default function ImagePool({ items, onRemoveItem }: ImagePoolProps) {
                       `}
                     >
                       <div className="relative">
-                        <AntImage
+                        <img
                           src={item.imageUrl}
                           alt={item.name}
-                          width={80}
-                          height={80}
-                          className="object-cover rounded-lg border-2 border-transparent hover:border-blue-300 transition-colors"
-                          preview={{
-                            mask: (
-                              <div className="flex items-center justify-center">
-                                <Eye size={16} className="text-white" />
-                              </div>
-                            ),
-                          }}
+                          className="w-20 h-20 object-cover rounded-lg border-2 border-transparent hover:border-blue-300 transition-colors"
+                          crossOrigin="anonymous"
                         />
                         <button
                           onClick={(e) => {

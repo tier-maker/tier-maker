@@ -1,7 +1,6 @@
 "use client";
 
 import { TierRow as TierRowType } from "@/types";
-import Image from "next/image";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { X, Edit2 } from "lucide-react";
 import { useState } from "react";
@@ -99,13 +98,11 @@ export default function TierRow({
                       `}
                     >
                       <div className="relative">
-                        <Image
+                        <img
                           src={item.imageUrl}
                           alt={item.name}
-                          width={64}
-                          height={64}
                           className="w-16 h-16 object-cover rounded border-2 border-transparent hover:border-blue-300 transition-colors"
-                          unoptimized
+                          crossOrigin="anonymous"
                         />
                         <button
                           onClick={(e) => {

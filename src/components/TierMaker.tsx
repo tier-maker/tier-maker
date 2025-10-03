@@ -17,7 +17,7 @@ import ThemeSettings from "./ThemeSettings";
 import Navbar from "./Navbar";
 import Button from "./Button";
 import { Download } from "lucide-react";
-import { exportElementAsImage } from "@/utils/exportUtils";
+import { exportTierListAsCanvas, exportTierListAsSVG } from "@/utils/canvasExport";
 import { useNavigation } from "@/utils/navigation";
 import { usePathname } from "next/navigation";
 
@@ -178,34 +178,95 @@ export default function TierMaker() {
   }, []);
 
   const exportTierList = useCallback(async () => {
-    const element = document.getElementById("tier-maker-content");
-    if (!element) return;
+    console.log("🚀 开始导出 Tier List...");
 
     try {
-      await exportElementAsImage(element, tierList.title);
-    } catch (error) {
-      console.error("Export failed:", error);
-      // 如果导出失败，回退到JSON导出
-      const data = {
-        title: tierList.title,
-        rows: tierList.rows.map((row) => ({
-          label: row.label,
-          color: row.color,
-          items: row.items.map((item) => ({
-            name: item.name,
-          })),
-        })),
+      // 首先尝试 Canvas 导出（推荐方案）
+      await exportTierListAsCanvas(tierList, tierList.title);
+      console.log("✅ Canvas 导出成功！");
+      
+      // 显示成功提示
+      const showSuccess = () => {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: #10b981;
+          color: white;
+          padding: 12px 20px;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          z-index: 10000;
+          font-family: Arial, sans-serif;
+          font-size: 14px;
+        `;
+        notification.textContent = '🎉 导出成功！';
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 3000);
       };
+      
+      showSuccess();
+      
+    } catch (canvasError) {
+      console.warn("Canvas 导出失败，尝试 SVG 导出:", canvasError);
+      
+      try {
+        // 尝试 SVG 导出作为备选方案
+        await exportTierListAsSVG(tierList, tierList.title);
+        console.log("✅ SVG 导出成功！");
+        alert("已导出为 SVG 格式");
+        
+      } catch (svgError) {
+        console.error("SVG 导出也失败，使用 JSON 导出:", svgError);
+        
+        // 最后的备选方案：JSON 导出
+        const fallbackToJson = confirm(
+          "图片导出失败，是否要导出为 JSON 格式作为备选方案？"
+        );
+        
+        if (fallbackToJson) {
+          try {
+            const data = {
+              title: tierList.title,
+              rows: tierList.rows.map((row) => ({
+                label: row.label,
+                color: row.color,
+                items: row.items.map((item) => ({
+                  id: item.id,
+                  name: item.name,
+                  imageUrl: item.imageUrl,
+                })),
+              })),
+              theme: tierList.theme,
+              backgroundImage: tierList.backgroundImage,
+              exportDate: new Date().toISOString(),
+              version: "1.0",
+            };
 
-      const blob = new Blob([JSON.stringify(data, null, 2)], {
-        type: "application/json",
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${tierList.title}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
+            const blob = new Blob([JSON.stringify(data, null, 2)], {
+              type: "application/json",
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${tierList.title}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            console.log("✅ JSON 导出成功！");
+            alert("已导出为 JSON 格式");
+          } catch (jsonError) {
+            console.error("所有导出方案都失败了:", jsonError);
+            alert("导出失败，请稍后重试或联系技术支持");
+          }
+        }
+      }
     }
   }, [tierList]);
 
