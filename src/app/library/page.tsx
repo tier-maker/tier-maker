@@ -5,13 +5,14 @@ import { DEFAULT_THEMES } from "@/types";
 import Navbar from "@/components/Navbar";
 import ClientWrapper from "@/components/ClientWrapper";
 import HeroLibrary from "@/components/HeroLibrary";
+import HexLibrary from "@/components/HexLibrary";
 import { useNavigation } from "@/utils/navigation";
-import { FolderOpen, Upload, Download, Star, GamepadIcon } from "lucide-react";
+import { FolderOpen, Upload, Download, Star, GamepadIcon, Hexagon } from "lucide-react";
 
 export default function LibraryPage() {
   const theme = DEFAULT_THEMES[0]; // 使用默认主题
   const { navigateToTab } = useNavigation();
-  const [currentView, setCurrentView] = useState<'main' | 'heroes'>('main');
+  const [currentView, setCurrentView] = useState<'main' | 'heroes' | 'hexes'>('main');
 
   return (
     <ClientWrapper>
@@ -75,6 +76,25 @@ export default function LibraryPage() {
                     </div>
                   </div>
 
+                  {/* 斗魂海克斯素材 */}
+                  <div
+                    className="p-6 rounded-lg border-2 border-dashed cursor-pointer transition-all hover:scale-105 hover:shadow-lg"
+                    style={{ borderColor: theme.secondary }}
+                    onClick={() => setCurrentView('hexes')}
+                  >
+                    <Hexagon
+                      size={32}
+                      className="mx-auto mb-3"
+                      style={{ color: theme.primary }}
+                    />
+                    <h3 className="text-lg font-semibold mb-2">斗魂海克斯素材</h3>
+                    <p className="text-sm opacity-70">50+ 个海克斯素材，支持批量下载</p>
+                    <div className="mt-3 text-xs px-2 py-1 rounded-full inline-block"
+                         style={{ backgroundColor: theme.primary, color: '#ffffff' }}>
+                      可用
+                    </div>
+                  </div>
+
                   <div
                     className="p-6 rounded-lg border-2 border-dashed"
                     style={{ borderColor: theme.secondary }}
@@ -132,14 +152,14 @@ export default function LibraryPage() {
                     className="text-2xl font-bold mb-2"
                     style={{ color: theme.primary }}
                   >
-                    🎮 LOL 英雄头像素材已上线！
+                    🎮 LOL 英雄头像 & 🔮 斗魂海克斯素材已上线！
                   </div>
                   <p className="text-sm opacity-70" style={{ color: theme.text }}>
                     点击上方卡片开始使用，更多素材正在开发中...
                   </p>
                 </div>
               </div>
-            ) : (
+            ) : currentView === 'heroes' ? (
               <div
                 className="rounded-xl shadow-lg p-6"
                 style={{
@@ -152,7 +172,20 @@ export default function LibraryPage() {
                   onBack={() => setCurrentView('main')} 
                 />
               </div>
-            )}
+            ) : currentView === 'hexes' ? (
+              <div
+                className="rounded-xl shadow-lg p-6"
+                style={{
+                  backgroundColor: theme.surface,
+                  color: theme.text,
+                }}
+              >
+                <HexLibrary 
+                  theme={theme} 
+                  onBack={() => setCurrentView('main')} 
+                />
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
