@@ -2,17 +2,46 @@
 
 import { TierItem } from "@/types";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
-import { X } from "lucide-react";
+import { X, Grid, Maximize2 } from "lucide-react";
 
 interface ImagePoolProps {
   items: TierItem[];
   onRemoveItem: (itemId: string) => void;
+  displayMode: 'square' | 'original';
+  onDisplayModeChange: (mode: 'square' | 'original') => void;
 }
 
-export default function ImagePool({ items, onRemoveItem }: ImagePoolProps) {
+export default function ImagePool({ items, onRemoveItem, displayMode, onDisplayModeChange }: ImagePoolProps) {
   return (
     <div className="w-full">
-      <h3 className="text-lg font-semibold mb-4 text-gray-800">图片池</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-800">图片池</h3>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-600">显示模式:</span>
+          <button
+            onClick={() => onDisplayModeChange('square')}
+            className={`p-2 rounded-lg transition-colors ${
+              displayMode === 'square'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+            }`}
+            title="方块模式"
+          >
+            <Grid size={16} />
+          </button>
+          <button
+            onClick={() => onDisplayModeChange('original')}
+            className={`p-2 rounded-lg transition-colors ${
+              displayMode === 'original'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+            }`}
+            title="原尺寸模式"
+          >
+            <Maximize2 size={16} />
+          </button>
+        </div>
+      </div>
       <Droppable droppableId="image-pool" direction="horizontal">
         {(provided, snapshot) => (
           <div
@@ -20,7 +49,8 @@ export default function ImagePool({ items, onRemoveItem }: ImagePoolProps) {
             {...provided.droppableProps}
             className={`
               min-h-[120px] p-4 border-2 border-dashed rounded-lg
-              flex flex-wrap gap-2 transition-colors
+              flex flex-wrap transition-colors
+              ${displayMode === 'square' ? 'gap-2' : 'gap-3 items-end'}
               ${
                 snapshot.isDraggingOver
                   ? "border-blue-500 bg-blue-50"
@@ -46,12 +76,25 @@ export default function ImagePool({ items, onRemoveItem }: ImagePoolProps) {
                       `}
                     >
                       <div className="relative">
-                        <img
-                          src={item.imageUrl}
-                          alt={item.name}
-                          className="w-20 h-20 object-cover rounded-lg border-2 border-transparent hover:border-blue-300 transition-colors"
-                          crossOrigin="anonymous"
-                        />
+                        {displayMode === 'square' ? (
+                          <img
+                            src={item.imageUrl}
+                            alt={item.name}
+                            className="w-20 h-20 object-cover rounded-lg border-2 border-transparent hover:border-blue-300 transition-colors"
+                            crossOrigin="anonymous"
+                          />
+                        ) : (
+                          <img
+                            src={item.imageUrl}
+                            alt={item.name}
+                            className="max-w-[120px] max-h-[80px] min-w-[60px] min-h-[40px] object-contain rounded-lg border-2 border-transparent hover:border-blue-300 transition-colors"
+                            crossOrigin="anonymous"
+                            style={{
+                              width: 'auto',
+                              height: 'auto'
+                            }}
+                          />
+                        )}
                         <button
                           onClick={(e) => {
                             e.stopPropagation();

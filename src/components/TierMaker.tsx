@@ -37,6 +37,9 @@ export default function TierMaker() {
     theme: DEFAULT_THEMES[0],
   });
 
+  // 图片池显示模式：'square' 为方块模式，'original' 为原尺寸模式
+  const [imagePoolDisplayMode, setImagePoolDisplayMode] = useState<'square' | 'original'>('square');
+
   // 根据当前路径确定活跃的 tab
   const getActiveTab = () => {
     switch (pathname) {
@@ -392,6 +395,8 @@ export default function TierMaker() {
                   <ImagePool
                     items={tierList.imagePool}
                     onRemoveItem={handleRemoveFromPool}
+                    displayMode={imagePoolDisplayMode}
+                    onDisplayModeChange={setImagePoolDisplayMode}
                   />
                 </div>
               </DragDropContext>
