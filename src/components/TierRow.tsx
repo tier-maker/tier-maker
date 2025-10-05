@@ -9,12 +9,14 @@ interface TierRowProps {
   row: TierRowType;
   onRemoveItem: (rowId: string, itemId: string) => void;
   onUpdateLabel: (rowId: string, newLabel: string) => void;
+  displayMode: 'square' | 'original';
 }
 
 export default function TierRow({
   row,
   onRemoveItem,
   onUpdateLabel,
+  displayMode,
 }: TierRowProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [tempLabel, setTempLabel] = useState(row.label);
@@ -73,8 +75,11 @@ export default function TierRow({
             ref={provided.innerRef}
             {...provided.droppableProps}
             className={`
-              flex-1 min-h-[100px] p-3 flex items-center gap-2
-              transition-colors
+              flex-1 p-3 transition-colors
+              ${displayMode === 'square' 
+                ? 'min-h-[100px] flex items-center gap-2' 
+                : 'min-h-[120px] flex flex-wrap items-start gap-3'
+              }
               ${
                 snapshot.isDraggingOver
                   ? "bg-blue-50 border-blue-300"
@@ -98,12 +103,25 @@ export default function TierRow({
                       `}
                     >
                       <div className="relative">
-                        <img
-                          src={item.imageUrl}
-                          alt={item.name}
-                          className="w-16 h-16 object-cover rounded border-2 border-transparent hover:border-blue-300 transition-colors"
-                          crossOrigin="anonymous"
-                        />
+                        {displayMode === 'square' ? (
+                          <img
+                            src={item.imageUrl}
+                            alt={item.name}
+                            className="w-16 h-16 object-cover rounded border-2 border-transparent hover:border-blue-300 transition-colors"
+                            crossOrigin="anonymous"
+                          />
+                        ) : (
+                          <img
+                            src={item.imageUrl}
+                            alt={item.name}
+                            className="max-w-[120px] max-h-[80px] min-w-[60px] min-h-[60px] object-contain rounded border-2 border-transparent hover:border-blue-300 transition-colors"
+                            crossOrigin="anonymous"
+                            style={{
+                              width: 'auto',
+                              height: 'auto'
+                            }}
+                          />
+                        )}
                         <button
                           onClick={(e) => {
                             e.stopPropagation();

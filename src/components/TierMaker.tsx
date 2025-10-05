@@ -385,6 +385,7 @@ export default function TierMaker() {
                         row={row}
                         onRemoveItem={handleRemoveFromTier}
                         onUpdateLabel={handleRowLabelUpdate}
+                        displayMode={imagePoolDisplayMode}
                       />
                     ))}
                   </div>

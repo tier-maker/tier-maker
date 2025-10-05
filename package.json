@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "download:heroes": "node ./scripts/download-heroes.mjs",
-    "download:arena": "node ./scripts/download-arena-augments.mjs"
+    "download:arena": "node ./scripts/download-arena-augments.mjs",
+    "process:hex": "node ./scripts/process-hex-images.js",
+    "rename:hex": "node ./scripts/rename-hex-images.js"
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.2",
@@ -22,7 +24,8 @@
     "next": "15.5.4",
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "sharp": "^0.34.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
